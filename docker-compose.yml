@@ -1,0 +1,31 @@
+services:
+  backend:
+    build: ./backend
+    env_file:
+      - ./envs/.env.dev   # <-- switch this per environment
+    volumes:
+      - ./backend:/app
+      - ./api-logs:/app/logs
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build: ./frontend
+    env_file:
+      - ./envs/.env.dev   # <-- switch this per environment
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules   # keeps container’s node_modules separate
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+  test:
+    build: ./backend
+    command: pytest
+    env_file:
+      - ./envs/.env.test   # <-- test config
+    volumes:
+      - ./backend:/app
+      - ./test-logs:/app/test-logs

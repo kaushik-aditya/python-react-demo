@@ -1,0 +1,3 @@
+/* minimal styles; in real app we could add Tailwind */
+body { font-family: system-ui, Arial, sans-serif; background: #f8fafc; margin: 0; }
+* { box-sizing: border-box; }
