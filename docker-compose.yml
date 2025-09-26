@@ -28,4 +28,4 @@ services:
       - ./envs/.env.test   # <-- test config
     volumes:
       - ./backend:/app
-      - ./test-logs:/app/test-logs
+      - ./backend/test-logs:/app/test-logs

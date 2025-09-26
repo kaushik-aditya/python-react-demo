@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.pyd
+*.egg-info/
+*.egg
+*.manifest
+*.spec
+
+# Virtual env
+.venv/
+env/
+venv/
+
+# Logs
+test-logs/
+logs/
+*.log
+
+# Pytest cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+test-logs/*
+!test-logs/.gitkeep
+
+# Databases
+*.db
+
