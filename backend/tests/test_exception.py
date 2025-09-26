@@ -2,14 +2,16 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from starlette import status
-from app.exceptions import AppError, register_exception_handlers
+
+from app.exceptions import AppError, add_global_exception_middleware, register_exception_handlers
 
 
 @pytest.fixture(scope="session")
 def app_with_exceptions():
-    """A lightweight FastAPI app with exception handlers registered"""
+    """Minimal FastAPI app with global exception handlers registered"""
     app = FastAPI()
     register_exception_handlers(app)
+    add_global_exception_middleware(app)
 
     @app.get("/raise-app-error")
     def raise_app_error():
@@ -17,7 +19,7 @@ def app_with_exceptions():
 
     @app.get("/raise-unhandled")
     def raise_unhandled():
-        raise ValueError("Boom!")
+        raise ValueError("Boom!")  # should be caught by global Exception handler
 
     return app
 

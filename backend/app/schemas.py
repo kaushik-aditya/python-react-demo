@@ -1,6 +1,6 @@
-from pydantic import BaseModel, Field, HttpUrl
-from typing import List, Optional
-
+from pydantic import BaseModel, Field, HttpUrl, field_validator
+from typing import List, Optional, Union
+import json
 
 # --- Base schema (shared) ---
 class RecipeBase(BaseModel):
@@ -18,6 +18,18 @@ class RecipeBase(BaseModel):
     tags: List[str] = []
     meal_type: List[str] = []
 
+    # ✅ Accept both real lists OR JSON strings like '["chicken","spices"]'
+    @field_validator("ingredients", "instructions", "tags", "meal_type", mode="before")
+    def parse_json_fields(cls, v: Union[str, List[str], None]):
+        if v is None:
+            return []
+        if isinstance(v, str):
+            try:
+                return json.loads(v)  # parse JSON string
+            except Exception:
+                return [v]  # fallback: wrap plain string
+        return v
+
 
 # --- Response schema ---
 class RecipeResponse(RecipeBase):
@@ -28,7 +40,7 @@ class RecipeResponse(RecipeBase):
     review_count: int = Field(default=0, ge=0)
 
     class Config:
-        orm_mode = True
+        orm_mode = True  # enables reading from ORM models
 
 
 # --- Create schema (for inserts) ---
@@ -51,3 +63,15 @@ class RecipeUpdate(BaseModel):
     instructions: Optional[List[str]] = None
     tags: Optional[List[str]] = None
     meal_type: Optional[List[str]] = None
+
+    # ✅ same parsing for update case
+    @field_validator("ingredients", "instructions", "tags", "meal_type", mode="before")
+    def parse_json_fields(cls, v: Union[str, List[str], None]):
+        if v is None:
+            return None
+        if isinstance(v, str):
+            try:
+                return json.loads(v)
+            except Exception:
+                return [v]
+        return v
