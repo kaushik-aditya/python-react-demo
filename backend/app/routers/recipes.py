@@ -1,12 +1,19 @@
-from typing import List
-from fastapi import APIRouter, Depends, HTTPException, Query
+import logging
+from typing import List, Optional
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
+
 from app.database import SessionLocal
-from app.schemas import RecipeResponse
-from app.crud import RecipeRepository
+from app.schemas.recipe import RecipeResponse
+from app.services.recipe_service import RecipeService
+from app.exceptions import AppError
 
-router = APIRouter()
+logger = logging.getLogger("recipes")
 
+router = APIRouter(prefix="/recipes", tags=["Recipes"])
+
+
+# Dependency for DB session
 def get_db():
     db = SessionLocal()
     try:
@@ -14,18 +21,44 @@ def get_db():
     finally:
         db.close()
 
+
 @router.get("/", response_model=List[RecipeResponse])
 def search_recipes(
-    search: str = Query(..., min_length=1, description="Free text on name/cuisine"),
+    search: Optional[str] = Query(None, min_length=1, description="Free text search (name, cuisine, tags)"),
+    cuisine: Optional[str] = Query(None, description="Filter by cuisine"),
+    difficulty: Optional[str] = Query(None, description="Filter by difficulty"),
+    sort_by: str = Query("id", description="Sort field"),
+    sort_order: str = Query("asc", regex="^(asc|desc)$", description="Sort order: asc or desc"),
+    limit: int = Query(20, ge=1, le=100, description="Max results"),
+    offset: int = Query(0, ge=0, description="Pagination offset"),
     db: Session = Depends(get_db),
 ):
-    repo = RecipeRepository(db)
-    return repo.search(search)
+    """
+    Search recipes by free-text, filters, sorting, and pagination.
+    """
+    print(">>> search_recipes endpoint called with difficulty:", difficulty)
+    service = RecipeService(db)
+    results = service.search(
+        query=search,
+        cuisine=cuisine,
+        difficulty=difficulty,
+        sort_by=sort_by,
+        sort_order=sort_order,
+        limit=limit,
+        offset=offset,
+    )
+    if not results:
+        raise AppError("No recipes found", status.HTTP_404_NOT_FOUND, "NOT_FOUND")
+    return results
+
 
 @router.get("/{recipe_id}", response_model=RecipeResponse)
 def get_recipe(recipe_id: int, db: Session = Depends(get_db)):
-    repo = RecipeRepository(db)
-    recipe = repo.get(recipe_id)
+    """
+    Get a recipe by ID.
+    """
+    service = RecipeService(db)
+    recipe = service.get_by_id(recipe_id)
     if not recipe:
-        raise HTTPException(status_code=404, detail="Recipe not found")
+        raise AppError("Recipe not found", status.HTTP_404_NOT_FOUND, "NOT_FOUND")
     return recipe

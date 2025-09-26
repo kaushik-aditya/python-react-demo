@@ -21,7 +21,12 @@ def init_db():
     - dev/test → auto-create tables for quick setup
     - prod → skip auto-creation (expect migrations)
     """
-    from app import models
+    # Import all models so Base.metadata is aware of them
+    from app.models.recipe import Recipe
+    from app.models.ingredient import Ingredient
+    from app.models.instruction import Instruction
+    from app.models.tag import Tag
+    from app.models.meal_type import MealType
 
     if settings.ENV in ["dev", "test"]:
         Base.metadata.create_all(bind=engine)

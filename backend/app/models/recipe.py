@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Float, Text
+from sqlalchemy import Column, Integer, String, Float, ForeignKey
+from sqlalchemy.orm import relationship
 from app.database import Base
 
 
@@ -8,7 +9,7 @@ class Recipe(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True, nullable=False)
 
-    # Core recipe fields
+    # Core fields
     cuisine = Column(String, index=True, default="")
     difficulty = Column(String, default="")
     servings = Column(Integer, default=0)
@@ -16,14 +17,14 @@ class Recipe(Base):
     cook_time_minutes = Column(Integer, default=0)
     calories_per_serving = Column(Integer, default=0)
 
-    # Arrays in JSON → stored as comma-separated text
-    ingredients = Column(Text, default="")    # list of ingredients
-    instructions = Column(Text, default="")   # list of steps
-    tags = Column(Text, default="")           # list of tags
-    meal_type = Column(Text, default="")      # list of meal types
-
     # Metadata
     user_id = Column(Integer, index=True)
     image = Column(String, default="")
     rating = Column(Float, default=0.0)
     review_count = Column(Integer, default=0)
+
+    # Relationships
+    ingredients = relationship("Ingredient", back_populates="recipe", cascade="all, delete-orphan")
+    instructions = relationship("Instruction", back_populates="recipe", cascade="all, delete-orphan")
+    tags = relationship("Tag", back_populates="recipe", cascade="all, delete-orphan")
+    meal_types = relationship("MealType", back_populates="recipe", cascade="all, delete-orphan")

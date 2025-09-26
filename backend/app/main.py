@@ -5,7 +5,7 @@ from app.routers import recipes
 from app.database import init_db, SessionLocal
 from app.logger import setup_logging, logger
 from app.exceptions import add_global_exception_middleware, register_exception_handlers
-from app.services import load_recipes_from_api
+from app.services.recipe_service import RecipeService
 
 
 def create_app() -> FastAPI:
@@ -35,7 +35,7 @@ def create_app() -> FastAPI:
 
 app = create_app()
 # Routers
-app.include_router(recipes.router, prefix="/recipes", tags=["Recipes"])
+app.include_router(recipes.router, tags=["Recipes"])
 
 # Status/health route
 @app.get("/status", tags=["Health"])
@@ -47,12 +47,16 @@ def get_status():
     }
 
 @app.on_event("startup")
-def startup_event():
+async def startup_event():
     logger.info("Initializing database and loading seed data from DummyJSON...")
     init_db()
     db = SessionLocal()
+    service = RecipeService(db)
     try:
-        load_recipes_from_api(db)
+        await service.load_recipes_from_api()
         logger.info("Seed data loaded successfully.")
+    except Exception as e:
+        logger.error("Failed to load seed data", exc_info=e)
     finally:
         db.close()
+

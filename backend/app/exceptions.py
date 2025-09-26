@@ -59,7 +59,7 @@ def register_exception_handlers(app):
         return JSONResponse(
             status_code=exc.status_code,
             content={
-                "error": "NOT_FOUND" if exc.status_code == 404 else "HTTP_ERROR",
+                "error": "HELLO" if exc.status_code == 404 else "HTTP_ERROR",
                 "message": exc.detail or "HTTP Error",
                 "status": exc.status_code,
                 "trace_id": trace_id,
