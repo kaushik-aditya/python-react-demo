@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     def DATABASE_URL(self) -> str:
         if self.ENV == "dev":
             # In-memory DB for quick dev cycles
-            return "sqlite+pysqlite:///:memory:"
+            return "sqlite:///file::memory:?cache=shared"
         elif self.ENV == "test":
             # File-based DB for reproducible tests
             return "sqlite+pysqlite:///./test.db"

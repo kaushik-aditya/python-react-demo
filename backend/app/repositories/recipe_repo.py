@@ -78,6 +78,7 @@ class RecipeRepository:
                     models.Recipe.cuisine.ilike(like),
                     models.Tag.name.ilike(like),
                     models.Ingredient.text.ilike(like),
+                    models.MealType.name.ilike(like)
                 )
             )
         if cuisine:
@@ -91,7 +92,7 @@ class RecipeRepository:
 
         # 🔑 Important in SQLite: prevent duplicates
         q = q.distinct()
-        print("custom print:", str(q.statement.compile(compile_kwargs={"literal_binds": True})))
+        logger.debug("custom print:", str(q.statement.compile(compile_kwargs={"literal_binds": True})))
 
         results = q.offset(offset).limit(limit).all()
         logger.debug("Repo: search returned %d results", len(results))

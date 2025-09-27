@@ -18,16 +18,16 @@ def setup_logging():
     if settings.ENV != "test":
         # Only add file handlers in dev/prod
         os.makedirs(LOG_DIR, exist_ok=True)
-
-        info_handler = logging.FileHandler(os.path.join(LOG_DIR, "api.log"))
-        info_handler.setLevel(logging.INFO)
-        info_handler.setFormatter(formatter)
-
+        
         error_handler = logging.FileHandler(os.path.join(LOG_DIR, "api-error.log"))
         error_handler.setLevel(logging.ERROR)
         error_handler.setFormatter(formatter)
+        
+        debug_handler = logging.FileHandler(os.path.join(LOG_DIR, "api.log"))
+        debug_handler.setLevel(logging.DEBUG)
+        debug_handler.setFormatter(formatter)
 
-        handlers.extend([info_handler, error_handler])
+        handlers.extend([error_handler,debug_handler])
 
     # Root logger
     root_logger = logging.getLogger()

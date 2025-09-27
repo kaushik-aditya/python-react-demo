@@ -36,7 +36,6 @@ def search_recipes(
     """
     Search recipes by free-text, filters, sorting, and pagination.
     """
-    print(">>> search_recipes endpoint called with difficulty:", difficulty)
     service = RecipeService(db)
     results = service.search(
         query=search,

@@ -40,6 +40,7 @@ app.include_router(recipes.router, tags=["Recipes"])
 # Status/health route
 @app.get("/status", tags=["Health"])
 def get_status():
+    logger.debug("Status check!!")
     return {
         "status": "ok",
         "app": app.title,

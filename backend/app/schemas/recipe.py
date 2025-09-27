@@ -40,17 +40,26 @@ class RecipeUpdate(BaseModel):
     meal_types: Optional[List[str]] = None
 
 
-class RecipeResponse(RecipeBase):
+class RecipeResponse(BaseModel):
     id: int
+    name: str = Field(..., min_length=1, max_length=200)
+    cuisine: str = Field("", max_length=100)
+    difficulty: str = Field("", max_length=50)
+    servings: int
+    prep_time_minutes: int
+    cook_time_minutes: int
+    calories_per_serving: Optional[int] = None
     user_id: Optional[int] = None
     image: Optional[HttpUrl] = None
     rating: float = Field(default=0.0, ge=0, le=5)
     review_count: int = Field(default=0, ge=0)
 
-    # Nested children
-    ingredients: List[IngredientResponse] = []
-    instructions: List[InstructionResponse] = []
-    tags: List[TagResponse] = []
-    meal_types: List[MealTypeResponse] = []
+    # Flattened fields
+    ingredients: List[str]
+    tags: List[str]
+    meal_types: List[str]
+
+    # More frontend-friendly: list of steps instead of dict
+    instructions: List[str]
 
     model_config = ConfigDict(from_attributes=True)

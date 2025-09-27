@@ -1,0 +1,8 @@
+test:
+    build: ./backend
+    command: pytest
+    env_file:
+      - ./envs/.env.test  
+    volumes:
+      - ./backend:/app
+      - ./backend/test-logs:/app/test-logs
