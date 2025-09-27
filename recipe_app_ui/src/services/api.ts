@@ -7,16 +7,18 @@ export async function getRecipes(search?: string): Promise<Recipe[]> {
   }
 
   const resp = await fetch(url);
-
-  if (resp.status === 404) {
-    // 404 = not found → return empty list
-    return [];
-  }
-
   if (!resp.ok) {
-    // other errors → throw with status info
+    // only throw for real errors (network/server)
     throw new Error(`HTTP ${resp.status} ${resp.statusText}`);
   }
 
-  return resp.json();
+  const data: Recipe[] = await resp.json();
+
+  // Explicitly handle "no data found"
+  if (Array.isArray(data) && data.length === 0) {
+    // Not an error — just return empty list
+    return [];
+  }
+
+  return data;
 }

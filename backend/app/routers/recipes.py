@@ -46,9 +46,8 @@ def search_recipes(
         limit=limit,
         offset=offset,
     )
-    if not results:
-        raise AppError("No recipes found", status.HTTP_404_NOT_FOUND, "NOT_FOUND")
-    return results
+    
+    return results or []
 
 
 @router.get("/{recipe_id}", response_model=RecipeResponse)
@@ -57,7 +56,5 @@ def get_recipe(recipe_id: int, db: Session = Depends(get_db)):
     Get a recipe by ID.
     """
     service = RecipeService(db)
-    recipe = service.get_by_id(recipe_id)
-    if not recipe:
-        raise AppError("Recipe not found", status.HTTP_404_NOT_FOUND, "NOT_FOUND")
-    return recipe
+    recipe = service.get_by_id(recipe_id)    
+    return recipe 
