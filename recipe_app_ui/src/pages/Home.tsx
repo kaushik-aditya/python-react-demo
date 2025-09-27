@@ -14,39 +14,45 @@ function HomeInner() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
+  const [loading, setLoading] = useState(false); 
   const { push } = useToast();
 
   const fetchRecipes = async (query?: string) => {
     try {
+        setLoading(true);
       const data = await getRecipes(query);
       setRecipes(data);
+
       if (!query) {
-        setSelectedTags([]); // reset filters only on fresh load
+        setSelectedTags([]);
       }
+      push({ type: "success", message: "Recipes loaded successfully!" });
+
     } catch (e: any) {
-      push({ type: "error", message: e?.message ?? "Failed to fetch recipes" });
+      if (e?.message?.includes("404")) {
+        setRecipes([]);
+        push({ type: "info", message: "No recipes found." });
+      } else {
+        setRecipes([]);
+        push({ type: "error", message: e?.message ?? "Failed to fetch recipes" });
+      }
+    }finally {
+      setLoading(false);
     }
   };
 
-  // ✅ Initial load
-  useEffect(() => {
-    fetchRecipes();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // ✅ Handle search
   const handleSearch = (query: string) => {
-    fetchRecipes(query);
+    if (query.length === 0 || query.length >= 3) {
+     fetchRecipes(query); 
+    } 
   };
 
-  // ✅ Available tags extracted from recipes
   const availableTags = useMemo(() => {
     const set = new Set<string>();
     recipes.forEach((r) => r.tags?.forEach((t) => set.add(t.trim())));
     return Array.from(set).sort();
   }, [recipes]);
 
-  // ✅ Apply tag filtering + sort in-memory
   const filteredSorted = useMemo(() => {
     let list = recipes;
     if (selectedTags.length) {
@@ -75,7 +81,7 @@ function HomeInner() {
           onSortChange={setSortOrder}
         />
       }
-      navbar={<Navbar onToggleSidebar={() => {}} onSearch={handleSearch} />}
+      navbar={<Navbar onToggleSidebar={() => {}} onSearch={handleSearch} loading={loading} />}
     >
       <RecipeGrid recipes={filteredSorted} />
     </DefaultLayout>

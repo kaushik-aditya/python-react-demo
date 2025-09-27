@@ -4,10 +4,11 @@ import SearchBar from "../molecules/SearchBar";
 
 type NavbarProps = {
   onToggleSidebar: () => void;
-  onSearch: (q: string) => void;   // add this
+  onSearch: (q: string) => void;
+  loading?: boolean;
 };
 
-const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar, onSearch }) => {
+const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar, onSearch, loading }) => {
   return (
     <header className="w-full bg-white border-b shadow-sm flex items-center px-4 py-3 gap-4">
       {/* Toggle button */}
@@ -26,7 +27,7 @@ const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar, onSearch }) => {
 
       {/* Search bar */}
       <div className="flex-1 max-w-xl mx-auto">
-        <SearchBar onSearch={onSearch} placeholder="Search recipes..." />
+        <SearchBar onSearch={onSearch} loading={loading} placeholder="Search recipes..." />
       </div>
     </header>
   );

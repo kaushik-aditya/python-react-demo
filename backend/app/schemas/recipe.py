@@ -63,3 +63,7 @@ class RecipeResponse(BaseModel):
     instructions: List[str]
 
     model_config = ConfigDict(from_attributes=True)
+    
+class PaginatedRecipes(BaseModel):
+    total: int
+    items: List[RecipeResponse]

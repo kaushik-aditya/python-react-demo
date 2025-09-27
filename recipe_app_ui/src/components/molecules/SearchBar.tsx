@@ -1,23 +1,29 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import CustomInput from "../atoms/CustomInput";
 import CustomButton from "../atoms/CustomButton";
-import { SearchIcon } from "../atoms/Icon";
+import { SearchIcon, LoaderIcon  } from "../atoms/Icon";
 
 type Props = {
   onSearch: (q: string) => void;
   minLength?: number;
   placeholder?: string;
+  loading?: boolean;
 };
 
 const SearchBar: React.FC<Props> = ({
   onSearch,
   minLength = 3,
-  placeholder = "Search recipes..."
+  placeholder = "Search recipes...",
+  loading = false
 }) => {
   const [q, setQ] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const triggerSearch = () => {
+  useEffect(() => {
+    if(q.length === 0) onSearch(q)
+  },[q])
+
+  const triggerSearch = () => {    
     if (q.length >= minLength) {
       onSearch(q);
     }
@@ -61,7 +67,11 @@ const SearchBar: React.FC<Props> = ({
           onClick={triggerSearch}
           disabled={q.length < minLength} // ✅ disable until minLength reached
         >
-          <SearchIcon className="h-5 w-5" />
+          {loading ? (
+            <LoaderIcon className="h-5 w-5 animate-spin text-gray-500" />
+          ) : (
+            <SearchIcon className="h-5 w-5 text-gray-500" />
+          )}
         </CustomButton>
       </div>
     </div>

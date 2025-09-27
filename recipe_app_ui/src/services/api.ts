@@ -1,15 +1,22 @@
 import type { Recipe } from "../types/recipe";
 
-const BASE_URL = "/api"; // will be proxied in vite.config.ts
-
-// ✅ Fetch all recipes (with optional search)
 export async function getRecipes(search?: string): Promise<Recipe[]> {
-  let url = `${BASE_URL}/recipes/`;
+  let url = "/api/recipes/";
   if (search && search.length >= 3) {
     url += `?search=${encodeURIComponent(search)}`;
   }
 
   const resp = await fetch(url);
-  if (!resp.ok) throw new Error("Failed to fetch recipes");
+
+  if (resp.status === 404) {
+    // 404 = not found → return empty list
+    return [];
+  }
+
+  if (!resp.ok) {
+    // other errors → throw with status info
+    throw new Error(`HTTP ${resp.status} ${resp.statusText}`);
+  }
+
   return resp.json();
 }

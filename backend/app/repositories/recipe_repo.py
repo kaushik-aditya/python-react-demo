@@ -50,24 +50,16 @@ class RecipeRepository:
         return True
 
     def search(
-        self,
-        query: Optional[str] = None,
-        cuisine: Optional[str] = None,
-        difficulty: Optional[str] = None,
-        sort_by: str = "id",
-        sort_order: str = "asc",
-        limit: int = 20,
-        offset: int = 0,
-    ) -> List[models.Recipe]:
+    self,
+    query: Optional[str] = None,
+    cuisine: Optional[str] = None,
+    difficulty: Optional[str] = None,
+    sort_by: Optional[str] = None,
+    sort_order: Optional[str] = None,
+    limit: Optional[int] = None,
+    offset: Optional[int] = None,
+) -> List[models.Recipe]:
         q = self.db.query(models.Recipe)
-
-        # Eager load children
-        q = q.options(
-            joinedload(models.Recipe.ingredients),
-            joinedload(models.Recipe.instructions),
-            joinedload(models.Recipe.tags),
-            joinedload(models.Recipe.meal_types),
-        )
 
         if query:
             like = f"%{query}%"
@@ -76,25 +68,62 @@ class RecipeRepository:
                 or_(
                     models.Recipe.name.ilike(like),
                     models.Recipe.cuisine.ilike(like),
-                    models.Tag.name.ilike(like),
-                    models.Ingredient.text.ilike(like),
-                    models.MealType.name.ilike(like)
                 )
             )
+
         if cuisine:
             q = q.filter(models.Recipe.cuisine.ilike(f"%{cuisine}%"))
         if difficulty:
             q = q.filter(models.Recipe.difficulty.ilike(f"%{difficulty}%"))
 
-        # Sorting
-        sort_column = getattr(models.Recipe, sort_by, models.Recipe.id)
-        q = q.order_by(desc(sort_column) if sort_order == "desc" else asc(sort_column))
+        # Only apply sorting if explicitly passed
+        if sort_by:
+            sort_column = getattr(models.Recipe, sort_by, models.Recipe.id)
+            if sort_order == "desc":
+                q = q.order_by(desc(sort_column))
+            else:
+                q = q.order_by(asc(sort_column))
 
-        # 🔑 Important in SQLite: prevent duplicates
+        # Only apply pagination if explicitly passed
+        if offset is not None:
+            q = q.offset(offset)
+        if limit is not None:
+            q = q.limit(limit)
+
         q = q.distinct()
-        logger.debug("custom print:", str(q.statement.compile(compile_kwargs={"literal_binds": True})))
 
-        results = q.offset(offset).limit(limit).all()
+        results = q.all()
         logger.debug("Repo: search returned %d results", len(results))
         return results
+
+    
+    def count(
+        self,
+        query: Optional[str] = None,
+        cuisine: Optional[str] = None,
+        difficulty: Optional[str] = None,
+    ) -> int:
+        """
+        Return the total number of recipes that match the filters (ignores limit/offset).
+        """
+        q = self.db.query(models.Recipe)
+
+        if query:
+            like = f"%{query}%"
+            q = q.outerjoin(models.Tag).outerjoin(models.Ingredient).outerjoin(models.MealType)
+            q = q.filter(
+                or_(
+                    models.Recipe.name.ilike(like),
+                    models.Recipe.cuisine.ilike(like),
+                )
+            )
+
+        if cuisine:
+            q = q.filter(models.Recipe.cuisine.ilike(f"%{cuisine}%"))
+        if difficulty:
+            q = q.filter(models.Recipe.difficulty.ilike(f"%{difficulty}%"))
+
+        total = q.distinct().count()
+        logger.debug("Repo: count returned %d", total)
+        return total
 

@@ -99,10 +99,10 @@ class RecipeService:
         query: Optional[str] = None,
         cuisine: Optional[str] = None,
         difficulty: Optional[str] = None,
-        sort_by: str = "id",
-        sort_order: str = "asc",
-        limit: int = 20,
-        offset: int = 0,
+        sort_by: Optional[str] = None,
+        sort_order: Optional[str] = None,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
     ) -> List[Dict[str, Any]]:
         logger.debug(
             "Service: searching recipes query=%s cuisine=%s difficulty=%s sort=%s %s limit=%s offset=%s",

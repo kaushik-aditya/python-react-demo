@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
 from app.database import SessionLocal
-from app.schemas.recipe import RecipeResponse
+from app.schemas.recipe import PaginatedRecipes, RecipeResponse
 from app.services.recipe_service import RecipeService
 from app.exceptions import AppError
 
@@ -27,10 +27,10 @@ def search_recipes(
     search: Optional[str] = Query(None, min_length=1, description="Free text search (name, cuisine, tags)"),
     cuisine: Optional[str] = Query(None, description="Filter by cuisine"),
     difficulty: Optional[str] = Query(None, description="Filter by difficulty"),
-    sort_by: str = Query("id", description="Sort field"),
-    sort_order: str = Query("asc", regex="^(asc|desc)$", description="Sort order: asc or desc"),
-    limit: int = Query(20, ge=1, le=100, description="Max results"),
-    offset: int = Query(0, ge=0, description="Pagination offset"),
+    sort_by: Optional[str] = Query(None, description="Sort field"),
+    sort_order: Optional[str] = Query(None, regex="^(asc|desc)$", description="Sort order: asc or desc"),
+    limit: Optional[int] = Query(None, ge=1, le=100, description="Max results"),
+    offset: Optional[int] = Query(None, ge=0, description="Pagination offset"),
     db: Session = Depends(get_db),
 ):
     """
