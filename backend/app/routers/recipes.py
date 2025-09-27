@@ -56,5 +56,7 @@ def get_recipe(recipe_id: int, db: Session = Depends(get_db)):
     Get a recipe by ID.
     """
     service = RecipeService(db)
-    recipe = service.get_by_id(recipe_id)    
-    return recipe 
+    recipe = service.get_by_id(recipe_id)
+    if not recipe:
+        raise AppError("Recipe not found", status.HTTP_404_NOT_FOUND, "NOT_FOUND")
+    return recipe

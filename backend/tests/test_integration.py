@@ -38,9 +38,7 @@ def test_search_endpoint_returns_200(test_client, db_session):
         text("INSERT INTO meal_types (recipe_id, name) VALUES (1, 'lunch')")
     )
 
-    db_session.commit()
-    rows = db_session.execute(text("SELECT * FROM recipes")).fetchall()
-    print("Recipes in DB:", rows)
+    db_session.commit()    
     # Test search
     resp = test_client.get("/recipes?difficulty=Easy")
     assert resp.status_code == 200

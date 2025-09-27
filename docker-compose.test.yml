@@ -1,8 +1,11 @@
-test:
+version: "3.9"
+
+services:
+  test:
     build: ./backend
     command: pytest
     env_file:
-      - ./envs/.env.test  
+      - ./envs/.env.test
     volumes:
       - ./backend:/app
       - ./backend/test-logs:/app/test-logs

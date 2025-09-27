@@ -8,7 +8,7 @@ def test_repository_get_and_search(db_session):
         name="UnitTest Soup",
         cuisine="TestKitchen",
         cook_time_minutes=15,
-        tags=[models.Tag(name="test"), models.Tag(name="unit")],   # ✅ LIST of Tag objects
+        tags=[models.Tag(name="test"), models.Tag(name="unit")],
     )
     db_session.add(r)
     db_session.commit()
