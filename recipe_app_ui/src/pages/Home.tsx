@@ -1,9 +1,9 @@
 import React, { Suspense, useEffect, useMemo, useState } from "react";
-import DefaultLayout from "../components/templates/DefaultLayout";
 import type { Recipe } from "../types/recipe";
 import { ToastProvider, useToast } from "../context/ToastContext";
 import { getRecipes } from "../services/api";
 import { useInView } from "react-intersection-observer";
+import DefaultLayout from "../components/organisms/DefaultLayout";
 
 // Lazy load components
 const Sidebar = React.lazy(() => import("../components/organisms/Sidebar"));
@@ -104,21 +104,15 @@ function HomeInner() {
   return (
     <DefaultLayout
       sidebar={
-        <Suspense fallback={<div className="p-4">Loading sidebar...</div>}>
-          <Sidebar
-            availableTags={availableTags}
-            selectedTags={selectedTags}
-            onToggleTag={handleToggleTag}
-            sortOrder={sortOrder}
-            onSortChange={setSortOrder}
-          />
-        </Suspense>
+        <Sidebar
+          availableTags={availableTags}
+          selectedTags={selectedTags}
+          onToggleTag={handleToggleTag}
+          sortOrder={sortOrder}
+          onSortChange={setSortOrder}
+        />
       }
-      navbar={
-        <Suspense fallback={<div className="p-4">Loading navbar...</div>}>
-          <Navbar onToggleSidebar={() => {}} onSearch={handleSearch} loading={loading} />
-        </Suspense>
-      }
+      navbar={<Navbar onSearch={handleSearch} loading={loading} />}
     >
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -127,20 +121,9 @@ function HomeInner() {
           ))}
         </div>
       ) : (
-        <Suspense
-          fallback={
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <SkeletonRecipeCard key={i} />
-              ))}
-            </div>
-          }
-        >
-          <RecipeGrid recipes={visibleRecipes} />
-        </Suspense>
+        <RecipeGrid recipes={visibleRecipes} />
       )}
 
-      {/* Scroll sentinel */}
       {visibleRecipes.length < filteredSorted.length && (
         <div ref={ref} className="h-8" />
       )}

@@ -4,19 +4,22 @@ import SearchBar from "../molecules/SearchBar";
 import CustomButton from "../atoms/CustomButton";
 
 type NavbarProps = {
-  onToggleSidebar: () => void;
+  onToggleSidebar?: () => void;
   onSearch: (q: string) => void;
   loading?: boolean;
 };
 
 const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar, onSearch, loading }) => {
+  const handleClick = () =>  {
+    onToggleSidebar?.() ;
+  }
   return (
     <header className="w-full bg-white border-b shadow-sm flex items-center px-4 py-3 gap-4">
       {/* Toggle button */}
       <CustomButton
         type="button"
         variant="icon"
-        onClick={onToggleSidebar}
+        onClick={handleClick}
         className="p-2 rounded-lg hover:bg-gray-100"
         aria-label="Toggle sidebar"
       >
