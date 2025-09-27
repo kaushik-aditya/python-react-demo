@@ -19,17 +19,6 @@ const Sidebar: React.FC<Props> = ({
 }) => {
   return (
     <div className="flex flex-col gap-6">
-      {/* Tags section */}
-      <section>
-        <h2 className="font-semibold mb-2 text-gray-700">Tags</h2>
-        <TagChips
-          availableTags={availableTags}
-          selectedTags={selectedTags}
-          onToggleTag={onToggleTag}
-        />
-      </section>
-
-      {/* Sort section */}
       <section>
         <h2 className="font-semibold mb-2 text-gray-700">Sort By</h2>
         <CustomSelector
@@ -41,6 +30,16 @@ const Sidebar: React.FC<Props> = ({
           onChange={(val) => onSortChange(val as "asc" | "desc")}
         />
       </section>
+      {/* Tags section */}
+      <section>
+        <h2 className="font-semibold mb-2 text-gray-700">Tags</h2>
+        <TagChips
+          availableTags={availableTags}
+          selectedTags={selectedTags}
+          onToggleTag={onToggleTag}
+        />
+      </section>
+      
     </div>
   );
 };

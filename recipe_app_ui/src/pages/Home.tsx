@@ -6,24 +6,21 @@ import RecipeGrid from "../components/organisms/RecipeGrid";
 import type { Recipe } from "../types/recipe";
 import { ToastProvider, useToast } from "../context/ToastContext";
 import ToastContainer from "../components/molecules/ToastContainer";
+import { getRecipes } from "../services/api"; // ✅ imported service
 
 type SortOrder = "asc" | "desc";
 
 function HomeInner() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [search, setSearch] = useState<string>("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const { push } = useToast();
 
-  // ✅ Fetch recipes from backend
-  const fetchRecipes = async (url: string) => {
+  const fetchRecipes = async (query?: string) => {
     try {
-      const resp = await fetch(url);
-      if (!resp.ok) throw new Error("Failed to fetch recipes");
-      const data: Recipe[] = await resp.json();
+      const data = await getRecipes(query);
       setRecipes(data);
-      if (!search) {
+      if (!query) {
         setSelectedTags([]); // reset filters only on fresh load
       }
     } catch (e: any) {
@@ -33,15 +30,13 @@ function HomeInner() {
 
   // ✅ Initial load
   useEffect(() => {
-    fetchRecipes("/api/recipes/");
+    fetchRecipes();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ✅ Handle search (triggered from Navbar)
+  // ✅ Handle search
   const handleSearch = (query: string) => {
-    setSearch(query);
-    if (query.length < 3) return;
-    fetchRecipes(`/api/recipes/?search=${encodeURIComponent(query)}`);
+    fetchRecipes(query);
   };
 
   // ✅ Available tags extracted from recipes

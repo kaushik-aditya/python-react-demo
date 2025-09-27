@@ -1,41 +1,66 @@
-import React from "react";
+import { Star, Clock } from "lucide-react";
 import type { Recipe } from "../../types/recipe";
 
-const RecipeCard: React.FC<{ recipe: Recipe }> = ({ recipe }) => {
+export default function RecipeCard({
+  name,
+  cuisine,
+  cook_time_minutes,
+  tags,
+  image,
+  rating,
+  review_count,
+}: Recipe) {
   return (
-    <div className="rounded-2xl bg-[var(--card)] border border-white/10 overflow-hidden hover:border-white/20 transition">
-      <div className="aspect-video bg-black/30">
-        {recipe.image ? (
+    <div className="bg-white rounded-2xl shadow-md hover:shadow-xl border transition overflow-hidden flex flex-col group">
+      {/* 🖼️ Recipe image */}
+      <div className="relative">
+        {image && (
           <img
-            src={recipe.image}
-            alt={recipe.name}
-            loading="lazy"
-            className="w-full h-full object-cover"
+            src={image}
+            alt={name}
+            className="h-52 w-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
-        ) : (
-          <div className="w-full h-full grid place-items-center text-white/40 text-sm">
-            No image
+        )}
+        {rating !== undefined && (
+          <div className="absolute top-2 right-2 bg-white/90 px-2 py-1 rounded-full flex items-center gap-1 text-yellow-500 text-sm shadow">
+            <Star className="w-4 h-4 fill-yellow-400" />
+            <span className="font-medium">{rating.toFixed(1)}</span>
           </div>
         )}
       </div>
-      <div className="p-4 space-y-2">
-        <div className="font-semibold">{recipe.name}</div>
-        <div className="text-xs text-white/60">
-          {recipe.cuisine} • {recipe.difficulty} • {recipe.servings} servings
+
+      {/* 📖 Content */}
+      <div className="p-5 flex flex-col gap-3 flex-1">
+        <h3 className="text-lg font-semibold text-gray-900 line-clamp-2 group-hover:text-indigo-600 transition">
+          {name}
+        </h3>
+        <p className="text-sm text-gray-500">{cuisine}</p>
+
+        {/* Time + Reviews */}
+        <div className="flex items-center justify-between text-sm text-gray-600">
+          <div className="flex items-center gap-1">
+            <Clock className="w-4 h-4 text-indigo-500" />
+            <span>{cook_time_minutes} mins</span>
+          </div>
+          {review_count !== undefined && (
+            <span className="text-gray-400">({review_count} reviews)</span>
+          )}
         </div>
-        <div className="text-xs text-white/60">
-          Prep {recipe.prep_time_minutes}m • Cook {recipe.cook_time_minutes}m
-        </div>
-        {recipe.tags?.length ? (
-          <div className="flex flex-wrap gap-1 pt-1">
-            {recipe.tags!.slice(0, 5).map(t => (
-              <span key={t} className="text-[10px] px-2 py-0.5 rounded-full bg-white/10 border border-white/10">{t}</span>
+
+        {/* 🏷️ Tags */}
+        {tags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-auto">
+            {tags.map((t) => (
+              <span
+                key={t}
+                className="px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-600 text-xs font-medium border border-indigo-100 shadow-sm"
+              >
+                {t}
+              </span>
             ))}
           </div>
-        ) : null}
+        )}
       </div>
     </div>
   );
-};
-
-export default RecipeCard;
+}

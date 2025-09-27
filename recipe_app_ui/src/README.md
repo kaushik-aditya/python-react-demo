@@ -19,7 +19,7 @@ src/
   context/ (ToastProvider)
   services/ (api.ts)
   types/ (recipe.ts)
-  utils/ (debounce, classNames)
+  utils/ (classNames)
   pages/ (Home.tsx)
   App.tsx, main.tsx, index.css
 ```
