@@ -2,16 +2,15 @@ services:
   backend:
     build: ./backend
     env_file:
-      - ./envs/.env.dev # <-- switch this per environment
+      - ./backend/envs/.env.dev # <-- switch this per environment
     volumes:
       - ./backend:/app
+      - ./backend/logs:/app/logs
     ports:
       - "8000:8000"
 
   frontend:
-    build: ./recipe_app_ui
-    env_file:
-      - ./envs/.env.dev
+    build: ./recipe_app_ui    
     volumes:
       - ./recipe_app_ui:/app
       - /app/node_modules

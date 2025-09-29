@@ -16,7 +16,7 @@ const DefaultLayout: React.FC<DefaultLayoutProps> = ({
   sidebar,
   navbar,
 }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">

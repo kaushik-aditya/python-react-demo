@@ -1,11 +1,19 @@
 version: "3.9"
 
 services:
-  test:
+  backend-test:
     build: ./backend
     command: pytest
     env_file:
-      - ./envs/.env.test
+      - ./backend/envs/.env.test
     volumes:
-      - ./backend:/app
       - ./backend/test-logs:/app/test-logs
+
+  frontend-test:
+    build:
+      context: ./recipe_app_ui
+      dockerfile: Dockerfile
+    command: npm run test:ci
+    volumes:      
+      - ./recipe_app_ui/test-logs:/app/test-logs
+      - /app/node_modules
